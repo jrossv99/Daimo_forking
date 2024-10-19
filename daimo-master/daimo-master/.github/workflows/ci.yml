@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22.x"
+
+      - run: |
+          cp apps/daimo-web/.env.example apps/daimo-web/.env
+          cp packages/daimo-api/.env.example packages/daimo-api/.env
+          npm ci
+          NODE_OPTIONS='--max-old-space-size=4096' npm test
+
+  test-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22.x"
+
+      - env:
+          BASE_MAINNET_RPC: ${{ vars.BASE_MAINNET_RPC }}
+        run: |
+          echo Using RPC $BASE_MAINNET_RPC
+          echo TOOLCHAIN
+          forge --version
+          echo TEST
+          make test
+          echo CODEGEN
+          cd ../.. && npm ci && npm run codegen
+          git diff --exit-code
+        working-directory: ./packages/contract
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22.x"
+
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - run: |
+          npm ci
+          npm run lint

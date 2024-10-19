@@ -1,0 +1,68 @@
+{
+  "cli": {
+    "version": ">= 3.9.2",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "base": {
+      "resourceClass": "large",
+      "node": "21.2.0",
+      "android": {
+        "image": "ubuntu-22.04-jdk-17-ndk-r21e"
+      },
+      "env": {
+        "DAIMO_PASSKEY_DOMAIN": "daimo.com"
+      }
+    },
+    "sim": {
+      "extends": "base",
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": true
+      },
+      "env": {
+        "DAIMO_APP_VARIANT": "sim"
+      }
+    },
+    "dev": {
+      "extends": "base",
+      "distribution": "internal",
+      "developmentClient": true,
+      "env": {
+        "DAIMO_APP_VARIANT": "dev"
+      }
+    },
+    "maestro": {
+      "extends": "base",
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "env": {
+        "DAIMO_APP_API_URL_MAINNET": "https://api.daimo.xyz",
+        "DAIMO_APP_API_URL_TESTNET": "https://api-stage.daimo.xyz",
+        "DAIMO_APP_VARIANT": "maestro"
+      }
+    },
+    "production": {
+      "extends": "base",
+      "autoIncrement": true,
+      "env": {
+        "DAIMO_APP_API_URL_MAINNET": "https://api.daimo.xyz",
+        "DAIMO_APP_API_URL_TESTNET": "https://api-stage.daimo.xyz",
+        "DAIMO_APP_VARIANT": "prod"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6459700343",
+        "companyName": "Daimo, Inc"
+      },
+      "android": {
+        "track": "internal"
+      }
+    }
+  }
+}
